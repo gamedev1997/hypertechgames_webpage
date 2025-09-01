@@ -4,8 +4,10 @@ const Hero = () => {
   return (
     <section id="home" className={styles.hero}>
       <div className={styles.heroContent}>
-        <h1>Premium HTML5 Games for a Global Audience</h1>
-        <p>We build and deliver scalable game solutions that drive engagement, maximize revenue, and adapt seamlessly to your platform needs.</p>
+        <p style={{fontSize: '1.5rem', marginBottom: '0.1rem', opacity: '0.5'}}>We Offer</p>
+        <h1>HTML5 Game Development and 
+          <br />Creative Solutions</h1>
+        <p>We're a next-gen HTML5 game studio delivering scalable, cross-platform games for web and mobile. Looking for engaging gameplay, brand-ready experiences, or playable ads that perform? You're in the right place.</p>
         <button className={styles.ctaButton} onClick={() => document.getElementById('contact').scrollIntoView({ behavior: 'smooth' })}>Get in Touch</button>
       </div>
     </section>

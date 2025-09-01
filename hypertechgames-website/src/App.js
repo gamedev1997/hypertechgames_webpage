@@ -7,6 +7,7 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import ThemeToggle from './components/ThemeToggle';
 import styles from './styles/App.module.css';
+import './styles/DarkTheme.css';
 import { handleActiveNavigation } from './utils/navigation';
 
 function App() {
@@ -15,7 +16,7 @@ function App() {
   }, []);
 
   return (
-    <div className={styles.app}>
+    <div className={`${styles.app} dark-theme-container`}>
       <Header />
       <Hero />
       <Services />
