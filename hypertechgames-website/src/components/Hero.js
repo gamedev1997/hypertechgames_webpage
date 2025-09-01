@@ -2,6 +2,7 @@ import styles from '../styles/App.module.css';
 
 const Hero = () => {
   return (
+    
     <section id="home" className={styles.hero}>
       <div className={styles.heroContent}>
         <p style={{fontSize: '1.5rem', marginBottom: '0.1rem', opacity: '0.5'}}>We Offer</p>
@@ -13,5 +14,7 @@ const Hero = () => {
     </section>
   );
 };
+
+console.log("Hero component loaded");
 
 export default Hero;
