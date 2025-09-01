@@ -15,6 +15,6 @@ const Hero = () => {
   );
 };
 
-console.log("Hero component loaded");
+console.log("Hero component loaded2");
 
 export default Hero;
