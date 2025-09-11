@@ -833,6 +833,15 @@ body {
   .contactContent {
     grid-template-columns: 1fr;
     gap: 2rem;
+    text-align: center;
+  }
+  
+  .contactInfo {
+    order: 1;
+  }
+  
+  .contactForm {
+    order: 2;
   }
 }
 
@@ -1058,6 +1067,163 @@ body {
   .footer {
     padding: 2rem 1rem 1rem;
   }
+  
+  .header {
+    height: 85px;
+    padding: 0.5rem;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+  
+  .themeToggle {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    width: 70px;
+    height: 35px;
+    position: fixed !important;
+  }
+  
+  .toggleIcon {
+    width: 28px;
+    height: 28px;
+    font-size: 1rem;
+  }
+  
+  .toggleSliderLight .toggleIcon {
+    left: 38px;
+  }
+  
+  .burgerMenu {
+    display: flex !important;
+    position: fixed !important;
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-50%);
+    z-index: 9999 !important;
+  }
+  
+  .logoImg {
+    height: 180px !important;
+    width: 180px !important;
+    position: absolute !important;
+    top: calc(50% +25px) !important;
+    left: 1rem !important;
+    transform: translateY(-50%) !important;
+  }
+  
+  .logoImg:hover {
+    transform: translateY(-50%) scale(1.05) !important;
+  }
+  
+  .logoImg:active {
+    transform: translateY(-50%) !important;
+  }
+  
+  .nav {
+    position: fixed;
+    top: 85px;
+    right: 0;
+    width: 250px;
+    height: calc(100vh - 85px);
+    background: rgba(10, 11, 30, 0.95);
+    flex-direction: column;
+    padding: 2rem 1rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    backdrop-filter: blur(10px);
+    z-index: 1040;
+  }
+  
+  [data-theme="light"] .nav {
+    background: rgba(30, 58, 138, 0.95);
+  }
+  
+  [data-theme="light"] .navLink {
+    color: #ffffff;
+  }
+  
+  .navOpen {
+    transform: translateX(0);
+  }
+  
+  .navLink {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  
+  .hero {
+    height: 80vh;
+    padding: 1rem;
+  }
+  
+  .heroContent h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .heroContent p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .ctaButton {
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+  }
+  
+  .services {
+    padding: 2rem 1rem;
+  }
+  
+  .services h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .portfolio {
+    padding: 2rem 1rem;
+  }
+  
+  .portfolio h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  .gamesGrid {
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .gameCard {
+    width: 90vw;
+    max-width: 320px;
+    margin: 0;
+  }
+  
+  .gameIcon {
+    width: calc(100% - 20px);
+    max-width: 280px;
+    height: 280px;
+    font-size: 4rem;
+  }
+  
+  .gameName {
+    font-size: 1rem;
+  }
+  
+  .servicesGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .serviceCard {
+    padding: 1rem;
+  }
+  
+  .serviceCard h3 {
+    font-size: 1.1rem;
+  }
 }
 
 .themeToggle {
@@ -1175,10 +1341,11 @@ body {
   border: none;
   cursor: pointer;
   padding: 0.5rem;
-  z-index: 9997 !important;
-  position: fixed !important;
-  top: 1rem !important;
-  right: 1rem !important;
+  z-index: 9999 !important;
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-50%);
   justify-content: center;
   align-items: center;
 }
@@ -1209,155 +1376,6 @@ body {
   transform: rotate(45deg) translate(-5px, -6px);
 }
 
-@media (max-width: 768px) {
-  .header {
-    height: 85px;
-    padding: 0.5rem;
-    flex-direction: row;
-    justify-content: space-between;
-  }
-  
-  .themeToggle {
-    bottom: 1rem !important;
-    right: 1rem !important;
-    width: 70px;
-    height: 35px;
-    position: fixed !important;
-  }
-  
-  .toggleIcon {
-    width: 28px;
-    height: 28px;
-    font-size: 1rem;
-  }
-  
-  .toggleSliderLight .toggleIcon {
-    left: 38px;
-  }
-  
-  .burgerMenu {
-    display: flex;
-    
-  }
-  
-  .logoImg {
-    height: 180px !important;
-    width: 180px !important;
-    position: absolute !important;
-    top: calc(50% +25px) !important;
-    left: 1rem !important;
-    transform: translateY(-50%) !important;
-  }
-  
-  .logoImg:hover {
-    transform: scale(1.05) !important;
-  }
-
-
-  
-  .nav {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 250px;
-    height: 100vh;
-    background: rgba(10, 11, 30, 0.95);
-    flex-direction: column;
-    padding: 2rem 1rem;
-    transform: translateX(100%);
-    transition: transform 0.3s ease;
-    backdrop-filter: blur(10px);
-    z-index: 1040;
-  }
-  
-  [data-theme="light"] .nav {
-    background: rgba(30, 58, 138, 0.95);
-  }
-  
-  [data-theme="light"] .navLink {
-    color: #ffffff;
-  }
-  
-  .navOpen {
-    transform: translateX(0);
-  }
-  
-  .navLink {
-    padding: 0.3rem 0.8rem;
-    font-size: 0.9rem;
-  }
-  
-  .hero {
-    height: 80vh;
-    padding: 1rem;
-  }
-  
-  .heroContent h1 {
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-  }
-  
-  .heroContent p {
-    font-size: 1rem;
-    margin-bottom: 1.5rem;
-  }
-  
-  .ctaButton {
-    padding: 0.8rem 1.5rem;
-    font-size: 1rem;
-  }
-  
-  .services {
-    padding: 2rem 1rem;
-  }
-  
-  .services h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .portfolio {
-    padding: 2rem 1rem;
-  }
-  
-  .portfolio h2 {
-    font-size: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .gamesGrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 2rem;
-  }
-  
-  .gameIcon {
-    width: 150px;
-    height: 150px;
-    font-size: 4rem;
-  }
-  
-  .gameName {
-    font-size: 1rem;
-  }
-  
-  .servicesGrid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  
-  .serviceCard {
-    padding: 1rem;
-  }
-  
-  .serviceCard h3 {
-    font-size: 1.1rem;
-  }
-  
-  .footer {
-    padding: 1.5rem 1rem;
-  }
-}
-
 @media (max-width: 480px) {
   .logoImg {
     height: 140px !important;
@@ -1384,15 +1402,16 @@ body {
     font-size: 1.8rem;
   }
   
-  .gamesGrid {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+  .gameCard {
+    width: 95vw;
+    max-width: 280px;
   }
   
   .gameIcon {
-    width: 200px;
-    height: 200px;
-    font-size: 5rem;
+    width: calc(100% - 20px);
+    max-width: 240px;
+    height: 240px;
+    font-size: 4rem;
   }
   
   .navLink {
