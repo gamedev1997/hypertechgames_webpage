@@ -8,9 +8,15 @@ import Footer from './components/Footer';
 import ThemeToggle from './components/ThemeToggle';
 import styles from './styles/App.module.css';
 import './styles/DarkTheme.css';
+import './styles/Lenis.css';
+import './styles/LenisHoverEffects.css';
+import './styles/ScrollAnimations.css';
 import { handleActiveNavigation } from './utils/navigation';
+import { useLenis } from './utils/useLenis';
 
 function App() {
+  useLenis();
+  
   useEffect(() => {
     handleActiveNavigation();
   }, []);

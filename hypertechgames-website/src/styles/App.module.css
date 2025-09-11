@@ -338,6 +338,7 @@ body {
 .ctaButton {
   background: linear-gradient(90deg, var(--primaryAccent), var(--secondaryAccent));
   color: white;
+  font-weight: bold;
   border: none;
   padding: 1rem 2rem;
   font-size: 1.1rem;
@@ -431,7 +432,7 @@ body {
 }
 
 .serviceCard {
-  background: var(--componentBackground);
+  background: rgba(15, 20, 25, 0.2);
   border-radius: 12px;
   padding: 1.5rem;
   box-shadow: 0 4px 20px rgba(255, 68, 68, 0.15);
@@ -477,7 +478,7 @@ body {
 .serviceCard:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: 0 8px 30px rgba(255, 68, 68, 0.4);
-  border-color: var(--primaryAccent);
+  border-color: white;
 }
 
 [data-theme="light"] .serviceCard {
@@ -553,16 +554,15 @@ body {
 }
 
 .gamesGrid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 2rem;
-  justify-items: center;
+  justify-content: center;
 }
 
 .gameCard {
-  background: var(--componentBackground);
+  background: rgba(15, 20, 25, 0.3);
   border-radius: 12px;
-  padding: 1rem;
+  padding: 10px;
   text-align: center;
   transition: all 0.3s ease;
   border: 1px solid rgba(0, 245, 255, 0.2);
@@ -572,6 +572,8 @@ body {
   opacity: 0;
   animation: cardSlideIn 0.6s ease-out forwards;
   cursor: pointer;
+  width: 370px;
+  margin: 20px;
 }
 
 .gameCard:nth-child(1) { animation-delay: 1.3s; }
@@ -582,7 +584,7 @@ body {
 .gameCard:hover {
   transform: translateY(-8px) scale(1.15);
   box-shadow: 0 8px 30px rgba(0, 245, 255, 0.3);
-  border-color: var(--primaryAccent);
+  border-color: #00f5ff;
 }
 
 [data-theme="light"] .gameCard {
@@ -594,8 +596,8 @@ body {
 }
 
 .gameIcon {
-  width: 160px;
-  height: 160px;
+  width: 350px;
+  height: 350px;
   background: linear-gradient(135deg, rgba(0, 245, 255, 0.1), rgba(0, 245, 255, 0.05));
   border-radius: 12px;
   display: flex;
@@ -612,8 +614,8 @@ body {
 }
 
 .gameName {
-  color: var(--primaryAccent);
-  font-size: 1.2rem;
+  color: #e6f3ff;
+  font-size: calc(1.2rem + 10px);
   margin: 0 0 0.5rem 0;
 }
 
@@ -731,7 +733,7 @@ body {
 
 .contactForm input,
 .contactForm textarea {
-  background: var(--componentBackground);
+  background: rgba(15, 20, 25, 0.6);
   border: 1px solid rgba(0, 245, 255, 0.2);
   border-radius: 8px;
   padding: 1rem;
@@ -776,8 +778,8 @@ body {
 .contactForm input:focus,
 .contactForm textarea:focus {
   outline: none;
-  border-color: var(--primaryAccent);
-  box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+  border-color: white;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
 }
 
 [data-theme="light"] .contactForm input:focus,
@@ -788,6 +790,7 @@ body {
 .submitButton {
   background: linear-gradient(90deg, var(--primaryAccent), var(--secondaryAccent));
   color: white;
+  font-weight: bold;
   border: none;
   padding: 1rem 2rem;
   font-size: 1.1rem;
@@ -962,6 +965,89 @@ body {
 
 [data-theme="light"] .footerBottom p {
   color: #ffffff;
+}
+
+[data-theme="light"] .gameCard {
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid #1e3a8a;
+}
+
+[data-theme="light"] .contactForm input,
+[data-theme="light"] .contactForm textarea {
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid #1e3a8a;
+}
+
+[data-theme="light"] .serviceCard {
+  background: rgba(255, 255, 255, 1);
+  border: 1px solid #1e3a8a;
+}
+
+[data-theme="light"] .gameName {
+  color: #1e3a8a;
+}
+
+.cursor {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+.comingSoonModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.comingSoonContent {
+  background: var(--componentBackground);
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 1px solid rgba(0, 245, 255, 0.3);
+}
+
+.comingSoonContent h3 {
+  color: var(--primaryAccent);
+  margin-bottom: 1rem;
+}
+
+.comingSoonContent p {
+  color: var(--textColor);
+  margin-bottom: 1.5rem;
+}
+
+.comingSoonContent button {
+  background: linear-gradient(90deg, var(--primaryAccent), var(--secondaryAccent));
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.serviceIcon {
+  font-size: 1.2rem;
+  color: #00f5ff;
+  margin-right: 0.5rem;
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+}
+
+.contactIcon {
+  font-size: 1.2rem;
+  color: #00f5ff;
+  margin-right: 0.5rem;
+  text-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
 }
 
 @media (max-width: 768px) {

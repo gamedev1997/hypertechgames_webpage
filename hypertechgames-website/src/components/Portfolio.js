@@ -1,59 +1,55 @@
 import { useState } from 'react';
 import styles from '../styles/App.module.css';
 import GameModal from './GameModal';
+import { useScrollAnimation } from '../utils/useScrollAnimation';
+import OnewayIcon from '../assets/Oneway.png';
+import BlockinIcon from '../assets/Blockin.png';
 
 const Portfolio = () => {
+  const sectionRef = useScrollAnimation();
   const [modalOpen, setModalOpen] = useState(false);
-  const [gameUrl, setGameUrl] = useState('');
+  const [selectedGame, setSelectedGame] = useState('');
   const games = [
     {
-      name: "Block Drop",
-      icon: "🎮",
-      description: "Classic Tetris-style puzzle game with modern graphics and smooth gameplay.",
-      url: "https://gameskite.com/play/football-stars#google_vignette"
+      name: "Oneway",
+      icon: OnewayIcon,
+      description: "Navigate through challenging one-way paths in this strategic puzzle adventure."
     },
     {
-      name: "Puzzle Master",
-      icon: "🧩",
-      description: "Mind-bending puzzle challenges that test your logic and problem-solving skills.",
-      url: "https://gameskite.com/play/football-stars#google_vignette"
-    },
-    {
-      name: "Space Runner",
-      icon: "🚀",
-      description: "Fast-paced endless runner through space with power-ups and obstacles.",
-      url: "https://gameskite.com/play/football-stars#google_vignette"
-    },
-    {
-      name: "Card Quest",
-      icon: "🃏",
-      description: "Strategic card-based adventure game with RPG elements and epic battles.",
-      url: "https://gameskite.com/play/football-stars#google_vignette"
+      name: "BlockIn",
+      icon: BlockinIcon,
+      description: "Block-matching puzzle game with addictive gameplay and stunning visuals."
     }
   ];
 
-  const handleGameClick = (url) => {
-    setGameUrl(url);
+  const handleGameClick = (gameName) => {
+    setSelectedGame(gameName);
     setModalOpen(true);
   };
 
   return (
-    <section id="portfolio" className={styles.portfolio}>
+    <section id="portfolio" className={`${styles.portfolio} scroll-animate`} ref={sectionRef}>
       <h2>Our Games</h2>
       <div className={styles.gamesGrid}>
         {games.map((game, index) => (
-          <div key={index} className={styles.gameCard} onClick={() => handleGameClick(game.url)}>
-            <div className={styles.gameIcon}>{game.icon}</div>
+          <div key={index} className={styles.gameCard} onClick={() => handleGameClick(game.name)}>
+            <div className={styles.gameIcon}>
+              <img src={game.icon} alt={game.name} style={{width: '100%', height: '100%', objectFit: 'contain'}} />
+            </div>
             <h3 className={styles.gameName}>{game.name}</h3>
             <p className={styles.gameDescription}>{game.description}</p>
           </div>
         ))}
       </div>
-      <GameModal 
-        isOpen={modalOpen} 
-        onClose={() => setModalOpen(false)} 
-        gameUrl={gameUrl} 
-      />
+      {modalOpen && (
+        <div className={styles.comingSoonModal} onClick={() => setModalOpen(false)}>
+          <div className={styles.comingSoonContent} onClick={(e) => e.stopPropagation()}>
+            <h3>{selectedGame} Game</h3>
+            <p>Coming Soon</p>
+            <button onClick={() => setModalOpen(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

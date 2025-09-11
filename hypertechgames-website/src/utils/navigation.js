@@ -2,6 +2,7 @@ export const handleActiveNavigation = () => {
   const sections = document.querySelectorAll('section[id]');
   const navLinks = document.querySelectorAll('a[href^="#"]');
   const contactSection = document.getElementById('contact');
+  const homeLink = document.querySelector('a[href="#home"]:not([href="#home"] img)');
   
   const setActiveStyles = (link, isLight) => {
     if (isLight) {
@@ -23,7 +24,6 @@ export const handleActiveNavigation = () => {
   
   // Set initial active state for home after a short delay
   setTimeout(() => {
-    const homeLink = document.querySelector('a[href="#home"]:not([href="#home"] img)');
     if (homeLink) {
       const isLight = document.documentElement.getAttribute('data-theme') === 'light';
       setActiveStyles(homeLink, isLight);
