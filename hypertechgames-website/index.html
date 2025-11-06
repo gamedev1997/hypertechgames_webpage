@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Phaser + CSS DOM Grid — 2-cell weapon demo</title>
+<script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser.min.js"></script>
+
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7503142162278242"
+     crossorigin="anonymous"></script>
+<style>
+  :root{
+    --bg: #222;
+    --ui-bg: rgba(0,0,0,0.35);
+    --cell-size: 64px;
+    --cols: 10;
+    --rows: 6;
+    --grid-origin-x: 40px;
+    --grid-origin-y: 80px;
+  }
+
+  html,body { height:100%; margin:0; background:var(--bg); font-family:Arial, sans-serif; color:#ddd; -webkit-user-select:none; user-select:none; }
+  #info {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    z-index: 60;
+    background: var(--ui-bg);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+
+  /* Phaser canvas container (holds canvas) */
+  #gameContainer {
+    position: absolute;
+    left: 0; top: 0;
+    z-index: 0;
+  }
+
+  /* Overlay that holds CSS grid cells and DOM weapon(s) */
+  #domOverlay {
+    position: absolute;
+    left: 0; top: 0;
+    pointer-events: none; /* allow pointer events only on children we enable */
+    z-index: 10;
+  }
+
+  /* Grid wrapper to place absolute-positioned cells */
+  #grid {
+    position: absolute;
+    left: var(--grid-origin-x);
+    top: var(--grid-origin-y);
+    width: calc(var(--cols) * var(--cell-size));
+    height: calc(var(--rows) * var(--cell-size));
+    pointer-events: none;
+  }
+
+  .cell {
+    position: absolute;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    box-sizing: border-box;
+    background: #444;
+    border: 2px solid #555;
+    pointer-events: none;
+    transition: background .08s, box-shadow .08s, border-color .08s;
+  }
+  .cell.preview-green { background: #2f7; box-shadow: 0 0 8px rgba(68,255,102,0.35); border-color: #2b9; }
+  .cell.preview-red   { background: #f66; box-shadow: 0 0 8px rgba(255,68,68,0.35); border-color: #f33; }
+  .cell.occupied      { background: #888; border-color: #666; box-shadow: none; }
+
+  /* Draggable weapon (palette) */
+  #weapon {
+    position: absolute;
+    left: 10px; top: 120px;
+    width: calc(var(--cell-size) * 2);
+    height: var(--cell-size);
+    border-radius: 8px;
+    background: linear-gradient(180deg,#3b82f6,#2563eb);
+    border: 2px solid #1347b8;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.6);
+    display:flex; align-items:center; justify-content:center;
+    font-weight:700; color:rgba(255,255,255,0.9);
+    cursor: grab;
+    z-index: 50;
+    pointer-events: auto; /* allow dragging */
+    user-select:none;
+    -webkit-user-drag: none;
+  }
+  #weapon.grabbing { cursor: grabbing; }
+
+  /* placed weapon visuals */
+  .placed-weapon {
+    position: absolute;
+    border-radius: 6px;
+    background: linear-gradient(180deg,#2563eb,#1e40af);
+    border: 2px solid #0f2d7a;
+    box-shadow: 0 6px 10px rgba(0,0,0,0.6);
+    z-index: 20;
+    pointer-events: none;
+  }
+
+  /* small helper text */
+  #hint { position:absolute; left:10px; bottom:10px; color:#bbb; z-index:60; font-size:13px; }
+</style>
+</head>
+<body>
+  <div id="info">Drag the blue weapon. Press <b>R</b> to rotate. Green = placeable, Red = blocked.</div>
+  <div id="gameContainer"></div>
+
+  <!-- DOM overlay (grid cells + weapon palette + placed weapons) -->
+  <div id="domOverlay">
+    <div id="grid"></div>
+    <div id="weapon" draggable="false">WEAPON</div>
+    <div id="placedLayer"></div>
+  </div>
+
+<script>
+/* ---------- CONFIG ---------- */
+const CELL_SIZE = 64;           // px
+const COLS = 10;
+const ROWS = 6;
+const GRID_ORIGIN_X = 40;       // px from left
+const GRID_ORIGIN_Y = 80;       // px from top
+
+/* Make CSS variables match JS values (so CSS sizes align) */
+document.documentElement.style.setProperty('--cell-size', CELL_SIZE + 'px');
+document.documentElement.style.setProperty('--cols', COLS);
+document.documentElement.style.setProperty('--rows', ROWS);
+document.documentElement.style.setProperty('--grid-origin-x', GRID_ORIGIN_X + 'px');
+document.documentElement.style.setProperty('--grid-origin-y', GRID_ORIGIN_Y + 'px');
+
+/* ---------- PHASER (canvas only) ---------- */
+const config = {
+  type: Phaser.AUTO,
+  parent: 'gameContainer',
+  width: GRID_ORIGIN_X * 2 + COLS * CELL_SIZE,
+  height: GRID_ORIGIN_Y * 2 + ROWS * CELL_SIZE,
+  backgroundColor: 0x222222,
+  scene: { preload: preload, create: create, update: update }
+};
+const game = new Phaser.Game(config);
+function preload() {}
+function create() {
+  // nothing necessary — we use DOM for visuals and Phaser just provides the canvas.
+}
+function update() {}
+
+/* ---------- DOM GRID & LOGIC (no images) ---------- */
+const gridEl = document.getElementById('grid');
+const weaponEl = document.getElementById('weapon');
+const placedLayer = document.getElementById('placedLayer');
+const domOverlay = document.getElementById('domOverlay');
+domOverlay.style.width  = config.width + 'px';
+domOverlay.style.height = config.height + 'px';
+
+/* Create grid cells as absolutely positioned divs */
+const cells = []; // 2d array [x][y] -> element
+for (let x=0; x<COLS; x++) {
+  cells[x] = [];
+  for (let y=0; y<ROWS; y++) {
+    const c = document.createElement('div');
+    c.className = 'cell';
+    c.style.left = (x * CELL_SIZE) + 'px';
+    c.style.top  = (y * CELL_SIZE) + 'px';
+    c.style.width = CELL_SIZE + 'px';
+    c.style.height = CELL_SIZE + 'px';
+    c.dataset.x = x;
+    c.dataset.y = y;
+    c.dataset.occupied = '0';
+    gridEl.appendChild(c);
+    cells[x][y] = c;
+  }
+}
+
+/* State variables for dragging & preview */
+let dragging = false;
+let offsetX = 0, offsetY = 0;           // pointer offset inside weapon when dragging
+let dragStartScreen = {x:0,y:0};
+let target = {tx:-1, ty:-1};
+let prevPreview = [];                   // previous preview cell coords
+let isVertical = false;                 // orientation
+let blocked = false;
+
+/* put weapon palette in start position variables */
+weaponEl.dataset.startX = weaponEl.offsetLeft;
+weaponEl.dataset.startY = weaponEl.offsetTop;
+
+/* Helper: clamp */
+function clamp(v, a, b){ return Math.max(a, Math.min(b, v)); }
+
+/* Utility: clear previous preview highlights */
+function clearPreview() {
+  for (const p of prevPreview) {
+    const cell = cells[p.x][p.y];
+    if (cell && cell.dataset.occupied === '0') {
+      cell.classList.remove('preview-green','preview-red');
+    }
+  }
+  prevPreview = [];
+}
+
+/* Compute preview for a given pointer position (client coords) */
+function updatePreviewForPointer(clientX, clientY){
+  // pointer relative to grid origin
+  const gridRect = gridEl.getBoundingClientRect();
+  const localX = clientX - gridRect.left;
+  const localY = clientY - gridRect.top;
+
+  // snapped indices
+  let tx = Math.floor(localX / CELL_SIZE);
+  let ty = Math.floor(localY / CELL_SIZE);
+
+  // depending on orientation, clamp so the weapon doesn't hang off edges
+  const w = isVertical ? 1 : 2;
+  const h = isVertical ? 2 : 1;
+  tx = clamp(tx, 0, COLS - w);
+  ty = clamp(ty, 0, ROWS - h);
+
+  // if target unchanged, do nothing
+  if (tx === target.tx && ty === target.ty) return;
+
+  // remember target and update preview
+  target.tx = tx; target.ty = ty;
+  clearPreview();
+
+  // compute the two cell coords
+  const coords = [{x:tx,y:ty}, {x: tx + (isVertical?0:1), y: ty + (isVertical?1:0)}];
+
+  // check bounds and occupancy
+  blocked = false;
+  for (const c of coords) {
+    if (c.x < 0 || c.y < 0 || c.x >= COLS || c.y >= ROWS) { blocked = true; break; }
+    if (cells[c.x][c.y].dataset.occupied === '1') { blocked = true; break; }
+  }
+
+  // color the two preview cells
+  for (const c of coords) {
+    const cell = cells[c.x][c.y];
+    if (!cell) continue;
+    cell.classList.add(blocked ? 'preview-red' : 'preview-green');
+    prevPreview.push({x:c.x,y:c.y});
+  }
+}
+
+/* Drag pointer handlers (use pointer events for mouse & touch) */
+weaponEl.addEventListener('pointerdown', function(ev){
+  ev.preventDefault();
+  dragging = true;
+  weaponEl.setPointerCapture(ev.pointerId);
+  weaponEl.classList.add('grabbing');
+
+  // calculate offset inside element so it doesn't jump
+  const rect = weaponEl.getBoundingClientRect();
+  offsetX = ev.clientX - rect.left;
+  offsetY = ev.clientY - rect.top;
+
+  // enable pointer events on overlay children (grid is pointer-events none; we use pointer coords)
+  domOverlay.style.pointerEvents = 'auto';
+
+  // update preview initially
+  updatePreviewForPointer(ev.clientX, ev.clientY);
+});
+
+window.addEventListener('pointermove', function(ev){
+  if (!dragging) return;
+  ev.preventDefault();
+
+  // position the weapon div (we'll snap it visually to grid after computing snap)
+  // compute world coords for snapped top-left based on pointer
+  const gridRect = gridEl.getBoundingClientRect();
+  let localX = ev.clientX - gridRect.left;
+  let localY = ev.clientY - gridRect.top;
+
+  let tx = Math.floor(localX / CELL_SIZE);
+  let ty = Math.floor(localY / CELL_SIZE);
+
+  const w = isVertical ? 1 : 2;
+  const h = isVertical ? 2 : 1;
+  tx = clamp(tx, 0, COLS - w);
+  ty = clamp(ty, 0, ROWS - h);
+
+  const snappedX = GRID_ORIGIN_X + tx * CELL_SIZE;
+  const snappedY = GRID_ORIGIN_Y + ty * CELL_SIZE;
+
+  weaponEl.style.left = snappedX + 'px';
+  weaponEl.style.top  = snappedY + 'px';
+
+  // update preview (only when target changes)
+  updatePreviewForPointer(ev.clientX, ev.clientY);
+});
+
+window.addEventListener('pointerup', function(ev){
+  if (!dragging) return;
+  dragging = false;
+  ev.preventDefault();
+  try { weaponEl.releasePointerCapture(ev.pointerId); } catch(e){}
+  weaponEl.classList.remove('grabbing');
+
+  // if not blocked -> place
+  if (!blocked && target.tx >= 0 && target.ty >= 0) {
+    // place permanent weapon element
+    const place = document.createElement('div');
+    place.className = 'placed-weapon';
+    const wPx = (isVertical ? CELL_SIZE : CELL_SIZE * 2);
+    const hPx = (isVertical ? CELL_SIZE * 2 : CELL_SIZE);
+    place.style.width  = wPx + 'px';
+    place.style.height = hPx + 'px';
+
+    // compute pixel position relative to overlay
+    const px = GRID_ORIGIN_X + target.tx * CELL_SIZE;
+    const py = GRID_ORIGIN_Y + target.ty * CELL_SIZE;
+    // If vertical we draw it as stacked cells (no rotation) by giving width=cell, height=2*cell
+    place.style.left = px + 'px';
+    place.style.top  = py + 'px';
+    placedLayer.appendChild(place);
+
+    // mark the two cells occupied
+    const coords = [{x: target.tx, y: target.ty}, {x: target.tx + (isVertical?0:1), y: target.ty + (isVertical?1:0)}];
+    for (const c of coords) {
+      const cell = cells[c.x][c.y];
+      cell.dataset.occupied = '1';
+      cell.classList.remove('preview-green','preview-red');
+      cell.classList.add('occupied');
+    }
+
+    // clear preview state
+    prevPreview = [];
+    target.tx = -1;
+    target.ty = -1;
+
+    // return weapon palette back to start
+    weaponEl.style.left = weaponEl.dataset.startX + 'px';
+    weaponEl.style.top  = weaponEl.dataset.startY + 'px';
+  } else {
+    // blocked -> revert and clear preview
+    clearPreview();
+    weaponEl.style.left = weaponEl.dataset.startX + 'px';
+    weaponEl.style.top  = weaponEl.dataset.startY + 'px';
+    target.tx = -1; target.ty = -1;
+  }
+
+  domOverlay.style.pointerEvents = 'none';
+});
+
+/* Rotation on R key while not placed (toggle orientation) */
+window.addEventListener('keydown', function(ev){
+  if (ev.key === 'r' || ev.key === 'R') {
+    isVertical = !isVertical;
+
+    // visually resize the draggable weapon (swap width/height)
+    if (isVertical) {
+      weaponEl.style.width = CELL_SIZE + 'px';
+      weaponEl.style.height = (CELL_SIZE * 2) + 'px';
+      weaponEl.textContent = 'WEAPON\nV';
+      weaponEl.style.whiteSpace = 'pre';
+    } else {
+      weaponEl.style.width = (CELL_SIZE * 2) + 'px';
+      weaponEl.style.height = CELL_SIZE + 'px';
+      weaponEl.textContent = 'WEAPON';
+      weaponEl.style.whiteSpace = 'normal';
+    }
+
+    // force re-evaluate preview if dragging
+    if (dragging) {
+      // use last pointer position by reading mouse coords
+      const e = window.event;
+      // We can't rely on window.event across browsers; instead compute from current weapon position:
+      const rect = weaponEl.getBoundingClientRect();
+      const centerX = rect.left + 8;
+      const centerY = rect.top + 8;
+      updatePreviewForPointer(centerX, centerY);
+    }
+  }
+});
+
+/* Prevent context menu so right-click won't disrupt */
+window.addEventListener('contextmenu', function(e){ e.preventDefault(); });
+
+</script>
+</body>
+</html>
